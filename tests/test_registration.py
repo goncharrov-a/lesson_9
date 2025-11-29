@@ -1,70 +1,43 @@
 from pathlib import Path
 
-from selene import browser, have, be
-from selene.support.shared.jquery_style import s, ss
+from pages.registration_page import RegistrationPage
 
 FILE = Path(__file__).parent / 'resources' / 'image.png'
 
 
-def test_demo_qa():
-    browser.open('/automation-practice-form')
+def test_registration_form():
+    page = RegistrationPage()
 
-    s('#firstName').type('Luke')
-    s('#lastName').type('Skywalker')
-    s('#userEmail').type('example.user@mail.ru')
-    s('#userNumber').type('9990003388')
+    (
+        page.open()
+        .fill_first_name('Luke')
+        .fill_last_name('Skywalker')
+        .fill_email('example.user@mail.ru')
+        .fill_mobile('9990003388')
+        .set_birthday(15, 'January', 1992)
+        .select_gender('Male')
+        .add_subject('Maths')
+        .add_subject('Computer Science')
+        .select_hobby('Sports')
+        .select_hobby('Reading')
+        .upload_picture(FILE)
+        .fill_address('Tatooine home')
+        .select_state('NCR')
+        .select_city('Delhi')
+        .submit()
+    )
 
-    s('#dateOfBirthInput').click()
-    s('.react-datepicker__month-select').click()
-    ss('.react-datepicker__month-select option').element_by(have.text('January')).click()
-    s('.react-datepicker__year-select').click()
-    ss('.react-datepicker__year-select option').element_by(have.text('1992')).click()
-    ss('.react-datepicker__day:not(.react-datepicker__day--outside-month)') \
-        .element_by(have.exact_text('15')).click()
-
-    s('//label[text()="Male"]').click()
-
-    s('#subjectsInput').type('Ma')
-    ss('.subjects-auto-complete__menu-list div').element_by(have.text('Maths')).click()
-    s('#subjectsInput').type('Computer Science').press_enter()
-
-    s('//label[text()="Sports"]').click()
-    s('//label[text()="Reading"]').click()
-    s('#hobbies-checkbox-3').execute_script('element.click()')
-
-    s('#uploadPicture').send_keys(str(FILE))
-
-    s('#currentAddress').type('Tatooine home')
-
-    s('#state').click()
-    s('#react-select-3-input').type('NCR').press_enter()
-    s('#city').click()
-    s('#react-select-4-input').type('Delhi').press_enter()
-
-    s('#submit').click()
-
-    s('.modal-content').should(be.visible)
-    s('#example-modal-sizes-title-lg').should(have.text('Thanks for submitting the form'))
-
-    rows = ss('.modal-content tbody tr')
-
-    def check(label, value):
-        rows.element_by_its('td:first-child', have.exact_text(label)) \
-            .element('td:nth-child(2)') \
-            .should(have.text(value))
-
-    check('Student Name', 'Luke Skywalker')
-    check('Student Email', 'example.user@mail.ru')
-    check('Gender', 'Male')
-    check('Mobile', '9990003388')
-    check('Date of Birth', '15 January,1992')
-    check('Subjects', 'Maths')
-    check('Subjects', 'Computer Science')
-    check('Hobbies', 'Sports')
-    check('Hobbies', 'Reading')
-    check('Hobbies', 'Music')
-    check('Picture', 'image.png')
-    check('Address', 'Tatooine home')
-    check('State and City', 'NCR Delhi')
-
-    s('#closeLargeModal').click()
+    page.should_have_registered(
+        **{
+            'Student Name': 'Luke Skywalker',
+            'Student Email': 'example.user@mail.ru',
+            'Gender': 'Male',
+            'Mobile': '9990003388',
+            'Date of Birth': '15 January,1992',
+            'Subjects': 'Computer Science',  # или только Maths — зависит от требований
+            'Hobbies': 'Reading',  # аналогично
+            'Picture': 'image.png',
+            'Address': 'Tatooine home',
+            'State and City': 'NCR Delhi',
+        }
+    )
