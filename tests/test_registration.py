@@ -34,8 +34,8 @@ def test_registration_form():
             'Gender': 'Male',
             'Mobile': '9990003388',
             'Date of Birth': '15 January,1992',
-            'Subjects': 'Computer Science',  # или только Maths — зависит от требований
-            'Hobbies': 'Reading',  # аналогично
+            'Subjects': 'Computer Science',
+            'Hobbies': 'Reading',
             'Picture': 'image.png',
             'Address': 'Tatooine home',
             'State and City': 'NCR Delhi',
